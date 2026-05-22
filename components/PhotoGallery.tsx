@@ -77,7 +77,7 @@ export default function PhotoGallery() {
           className="text-2xl text-red-500 tracking-widest flex items-center gap-2"
           style={{ fontFamily: "var(--font-bebas)" }}
         >
-          <ImageIcon size={20} />
+          <ImageIcon size={18} />
           GALLERY
         </h2>
 
@@ -115,7 +115,7 @@ export default function PhotoGallery() {
             onClick={() => setLightboxIdx(idx)}
             aria-label={`Apri foto: ${foto.alt}`}
             className="relative flex-shrink-0 rounded-2xl overflow-hidden group focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-950"
-            style={{ width: 160, height: 210 }}
+            style={{ width: 140, height: 165 }}
           >
             <Image
               src={foto.src}

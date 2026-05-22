@@ -17,7 +17,7 @@ const MENU_VOCI = [
 
 export default function ProfiloPage() {
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
+    <div className="max-w-2xl mx-auto px-4 py-3 space-y-4">
       <h2
         className="text-2xl text-red-500 tracking-widest"
         style={{ fontFamily: "var(--font-bebas)" }}
@@ -26,7 +26,7 @@ export default function ProfiloPage() {
       </h2>
 
       {/* Avatar e dati */}
-      <div className="flex flex-col items-center py-6 space-y-3">
+      <div className="flex flex-col items-center py-3 space-y-2">
         <div className="w-20 h-20 rounded-full bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center text-3xl font-bold text-white shadow-lg shadow-red-500/30">
           {UTENTE_MOCK.nome.charAt(0)}
         </div>

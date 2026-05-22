@@ -49,7 +49,7 @@ export default function PrenotazioneModal() {
   return (
     <section>
       <h2
-        className="text-2xl text-red-500 mb-4 tracking-widest"
+        className="text-2xl text-red-500 mb-3 tracking-widest"
         style={{ fontFamily: "var(--font-bebas)" }}
       >
         PRENOTA IL TUO TURNO
@@ -58,7 +58,7 @@ export default function PrenotazioneModal() {
       {/* Pulsante principale */}
       <button
         onClick={() => setIsOpen(true)}
-        className="w-full py-5 rounded-2xl bg-gradient-to-r from-red-500 to-red-700 text-white font-bold text-xl shadow-lg shadow-red-500/25 hover:shadow-red-500/40 active:scale-[0.98] transition-all flex items-center justify-center gap-3"
+        className="w-full py-4 rounded-2xl bg-gradient-to-r from-red-500 to-red-700 text-white font-bold text-lg shadow-lg shadow-red-500/25 hover:shadow-red-500/40 active:scale-[0.98] transition-all flex items-center justify-center gap-3"
       >
         <CalendarDays size={24} />
         Prenotati

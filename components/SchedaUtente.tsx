@@ -92,7 +92,7 @@ export default function SchedaUtente() {
   return (
     <section>
       <h2
-        className="text-2xl text-red-500 mb-4 tracking-widest flex items-center gap-2"
+        className="text-2xl text-red-500 mb-2 tracking-widest flex items-center gap-2"
         style={{ fontFamily: "var(--font-bebas)" }}
       >
         <Dumbbell size={22} />
