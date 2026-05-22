@@ -124,19 +124,25 @@ export default function TimeWheelPicker({ value, onChange }: Props) {
         {TIME_SLOTS.map((slot, i) => {
           const dist = Math.abs(i - displayIdx);
           return (
-            <div
+            <button
               key={slot}
               style={{ height: ITEM_H, scrollSnapAlign: "center" }}
-              className={`flex items-center justify-center font-mono tracking-widest transition-all duration-100 ${
+              onClick={() => {
+                if (snapTimer.current) clearTimeout(snapTimer.current);
+                setDisplayIdx(i);
+                scrollToIdx(i, "smooth");
+                onChange(slot);
+              }}
+              className={`w-full flex items-center justify-center font-mono tracking-widest transition-all duration-100 ${
                 dist === 0
-                  ? "text-white text-[26px] font-bold"
+                  ? "text-white text-[26px] font-bold cursor-default"
                   : dist === 1
-                  ? "text-gray-400 text-xl"
-                  : "text-gray-600 text-base"
+                  ? "text-gray-400 text-xl cursor-pointer"
+                  : "text-gray-600 text-base cursor-pointer"
               }`}
             >
               {slot}
-            </div>
+            </button>
           );
         })}
 
