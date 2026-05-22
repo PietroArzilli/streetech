@@ -41,11 +41,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="it" className={`${inter.variable} ${bebasNeue.variable}`}>
-      <body className="bg-gray-950 text-white min-h-screen flex flex-col">
+      <body className="bg-gray-950 text-white h-full flex flex-col overflow-hidden">
         <ServiceWorkerRegistrar />
         <Header />
-        {/* pb-20 lascia spazio alla bottom nav fissa */}
-        <main className="flex-1 pb-20">
+        <main className="flex-1 overflow-y-auto">
           {children}
         </main>
         <BottomNav />
