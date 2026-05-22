@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Dumbbell, ChevronRight, X, Upload } from "lucide-react";
+import { Dumbbell, ChevronRight, X, Upload, Loader2 } from "lucide-react";
 
 const MOCK_SCHEDA = `SCHEDA DI ALLENAMENTO — Marco Rossi
 Aggiornata: Maggio 2026
@@ -70,23 +70,65 @@ prima della sessione.
 
   — Coach Alex`;
 
+async function extractPdfText(file: File): Promise<string> {
+  const pdfjsLib = await import("pdfjs-dist");
+  pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+
+  const arrayBuffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+  let fullText = `📄 ${file.name}\n${"─".repeat(34)}\n\n`;
+
+  for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+    const page = await pdf.getPage(pageNum);
+    const content = await page.getTextContent();
+
+    // Ricostruisce le righe raggruppando per posizione Y (asse invertito in PDF)
+    const lineMap: Map<number, string[]> = new Map();
+    for (const item of content.items) {
+      if (!("str" in item) || !item.str.trim()) continue;
+      const y = Math.round(item.transform[5]);
+      if (!lineMap.has(y)) lineMap.set(y, []);
+      lineMap.get(y)!.push(item.str);
+    }
+
+    // Le Y nei PDF sono bottom-up → ordiniamo decrescente
+    const lines = [...lineMap.entries()]
+      .sort((a, b) => b[0] - a[0])
+      .map(([, parts]) => parts.join(""));
+
+    fullText += lines.join("\n");
+    if (pageNum < pdf.numPages) fullText += `\n\n── Pagina ${pageNum} / ${pdf.numPages} ──\n\n`;
+  }
+
+  return fullText.trim();
+}
+
 export default function SchedaUtente() {
   const [scheda, setScheda] = useState<string>(MOCK_SCHEDA);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    e.target.value = "";
+
     if (file.type === "text/plain") {
       setScheda(await file.text());
     } else if (file.type === "application/pdf") {
-      setScheda(`📄 ${file.name}\n\n[Contenuto PDF]\nL'estrazione del testo da PDF richiede un'integrazione server-side.\nPer questa demo carica un file .txt.`);
+      setIsLoading(true);
+      try {
+        setScheda(await extractPdfText(file));
+      } catch {
+        setScheda(`📄 ${file.name}\n\nImpossibile estrarre il testo.\nIl PDF potrebbe essere una scansione (immagine) senza testo selezionabile.`);
+      } finally {
+        setIsLoading(false);
+      }
     } else {
       alert("Formato non supportato. Usa .txt o .pdf");
-      return;
     }
-    e.target.value = "";
   };
 
   return (
@@ -107,7 +149,6 @@ export default function SchedaUtente() {
         onChange={handleFileUpload}
       />
 
-      {/* Bottone principale — apre il viewer */}
       <button
         onClick={() => setIsViewerOpen(true)}
         className="w-full flex items-center gap-4 bg-gray-900 border border-gray-700/60 rounded-2xl px-5 py-4 hover:border-red-500/40 hover:bg-gray-800/60 active:bg-gray-800 transition-all group"
@@ -122,7 +163,6 @@ export default function SchedaUtente() {
         <ChevronRight size={18} className="text-gray-600 group-hover:text-red-400 transition-colors" />
       </button>
 
-      {/* Viewer full-screen */}
       {isViewerOpen && (
         <div className="fixed inset-0 z-50 bg-gray-950 flex flex-col">
           <div className="flex items-center gap-3 px-4 h-14 border-b border-gray-800/80 flex-shrink-0 bg-gray-950">
@@ -141,16 +181,24 @@ export default function SchedaUtente() {
             </h3>
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-red-400 transition-colors"
+              disabled={isLoading}
+              className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-red-400 transition-colors disabled:opacity-50"
             >
-              <Upload size={12} />
-              Aggiorna
+              {isLoading ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
+              {isLoading ? "Caricamento…" : "Aggiorna"}
             </button>
           </div>
           <div className="flex-1 overflow-y-auto px-5 py-6">
-            <pre className="text-[15px] text-gray-100 whitespace-pre-wrap font-mono leading-7 tracking-wide">
-              {scheda}
-            </pre>
+            {isLoading ? (
+              <div className="flex flex-col items-center justify-center h-full gap-3 text-gray-500">
+                <Loader2 size={32} className="animate-spin text-red-500" />
+                <p className="text-sm">Estrazione testo dal PDF…</p>
+              </div>
+            ) : (
+              <pre className="text-[15px] text-gray-100 whitespace-pre-wrap font-mono leading-7 tracking-wide">
+                {scheda}
+              </pre>
+            )}
           </div>
         </div>
       )}
