@@ -70,7 +70,7 @@ export default function PhotoGallery() {
   const currentPhoto = lightboxIdx !== null ? FOTO_GALLERY[lightboxIdx] : null;
 
   return (
-    <section>
+    <section className="h-full flex flex-col">
       {/* Header sezione con frecce scorrimento */}
       <div className="flex items-center justify-between mb-4">
         <h2
@@ -102,11 +102,11 @@ export default function PhotoGallery() {
         </div>
       </div>
 
-      {/* Carousel orizzontale */}
+      {/* Carousel orizzontale — flex-1 per riempire lo spazio fino alla nav */}
       <div
         ref={scrollRef}
         onScroll={updateArrows}
-        className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4"
+        className="flex gap-3 overflow-x-auto flex-1 min-h-0 -mx-4 px-4"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
         {FOTO_GALLERY.map((foto, idx) => (
@@ -114,8 +114,8 @@ export default function PhotoGallery() {
             key={foto.id}
             onClick={() => setLightboxIdx(idx)}
             aria-label={`Apri foto: ${foto.alt}`}
-            className="relative flex-shrink-0 rounded-2xl overflow-hidden group focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-950"
-            style={{ width: 140, height: 165 }}
+            className="relative flex-shrink-0 h-full rounded-2xl overflow-hidden group focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-950"
+            style={{ width: 140 }}
           >
             <Image
               src={foto.src}
